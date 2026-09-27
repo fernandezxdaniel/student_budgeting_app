@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Budget Summary</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h2>📊 Budget Summary</h2>
+    <p>Total Expenses: {{ total }}</p>
+    <p>Most Expensive Category: {{ most }}</p>
+    <p>Least Expensive Category: {{ least }}</p>
+
+    <table>
+      <tr><th>Category</th><th>Expense</th></tr>
+      {% for cat, exp in combined %}
+        <tr><td>{{ cat }}</td><td>{{ exp }}</td></tr>
+      {% endfor %}
+    </table>
+
+    <canvas id="expenseChart" width="400" height="200"></canvas>
+    <script>
+      const ctx = document.getElementById('expenseChart').getContext('2d');
+      const expenseChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: {{ categories|tojson }},
+          datasets: [{
+            label: 'Expenses',
+            data: {{ expenses|tojson }},
+            backgroundColor: [
+              '#6a1b9a','#8e24aa','#9c27b0','#ab47bc','#ba68c8','#ce93d8'
+            ]
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false },
+            title: { display: true, text: 'Expenses per Category' }
+          }
+        }
+      });
+    </script>
+
+    <div class="suggestions">
+      {% if total > 5000 %}
+        <p>⚠ Overspending detected! Try reducing non‑essentials.</p>
+      {% else %}
+        <p>✅ Good balance! Consider saving more.</p>
+      {% endif %}
+    </div>
+  </div>
+</body>
+</html>
+
